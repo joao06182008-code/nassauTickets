@@ -4,6 +4,7 @@ const helmet = require('helmet');
 require('dotenv').config();
 
 const pool = require('./config/db');
+const ticketRoutes = require('./routes/ticketRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -21,6 +22,9 @@ app.get('/api/health', async (req, res) => {
     res.status(500).json({ status: 'erro', message: error.message });
   }
 });
+
+// Registar as rotas da aplicação
+app.use('/api', ticketRoutes);
 
 app.listen(PORT, () => {
   console.log(`Servidor nassauTickets a correr na porta ${PORT}`);
