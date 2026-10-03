@@ -28,7 +28,7 @@ const emitirSenha = async (req, res) => {
     const hoje = new Date().toISOString().slice(0, 10); // Formato YYYY-MM-DD
 
     let [seqs] = await connection.query(
-      'SELECT ultimo_numero FROM sequenciais_diarios WHERE data = ? AND tipo_codigo = ? FOR UPDATE',
+      'SELECT ultimo_numero FROM sequenciais_diarios WHERE data_referencia = ? AND tipo_codigo = ? FOR UPDATE',
       [hoje, tipo_codigo]
     );
 
@@ -36,17 +36,17 @@ const emitirSenha = async (req, res) => {
     if (seqs.length > 0) {
       proximoNumero = seqs[0].ultimo_numero + 1;
       await connection.query(
-        'UPDATE sequenciais_diarios SET ultimo_numero = ? WHERE data = ? AND tipo_codigo = ?',
+        'UPDATE sequenciais_diarios SET ultimo_numero = ? WHERE data_referencia = ? AND tipo_codigo = ?',
         [proximoNumero, hoje, tipo_codigo]
       );
     } else {
       await connection.query(
-        'INSERT INTO sequenciais_diarios (data, tipo_codigo, ultimo_numero) VALUES (?, ?, ?)',
+        'INSERT INTO sequenciais_diarios (data_referencia, tipo_codigo, ultimo_numero) VALUES (?, ?, ?)',
         [hoje, tipo_codigo, proximoNumero]
       );
     }
 
-    // 3. Formatar o código da senha (Ex: 260601-SP001)
+    // 3. Formatar o código da senha (Ex: 261003-SP001)
     const dataFormatada = hoje.replace(/-/g, '').slice(2); // YYMMDD
     const numeroFormatado = String(proximoNumero).padStart(3, '0');
     const codigoSenha = `${dataFormatada}-${tipo_codigo}${numeroFormatado}`;
